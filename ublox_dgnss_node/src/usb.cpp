@@ -91,7 +91,7 @@ void Connection::init()
 void Connection::open_device()
 {
   // retrieves the first matching
-  devh_ = libusb_open_device_with_vid_pid(ctx_, vendor_id_, product_id_);
+  devh_ = libusb_open_device_with_vid_pid(ctx_, 0x1546, 0x01a9);
   if (!devh_) {
     throw "Error finding USB device";
   }
@@ -127,7 +127,7 @@ void Connection::open_device()
   }
   auto num_configurations = dev_desc.bNumConfigurations;  // this should be 1
   if (num_configurations != 1) {
-    throw "Error bNumConfigurations is not 1 - dont know which configuration to use";
+    throw "Error bNumConfigurations is not 1 - dont know which configuration to use" + std::to_string(num_configurations);
   }
 
   /* get the active USB configuration descriptor */
@@ -452,7 +452,7 @@ std::shared_ptr<transfer_t> Connection::make_transfer_in()
   // setup asynchronous transfer in to host from usb
   libusb_fill_bulk_transfer(
     transfer_in, devh_, ep_data_in_addr_ | LIBUSB_ENDPOINT_IN,
-    // in_buffer_, IN_BUFFER_SIZE,
+    //in_buffer_, IN_BUFFER_SIZE,
     transfer->buffer->data(), transfer->buffer->size(),
     callback_in_fn, user_data, 0);   // no timeout
 
